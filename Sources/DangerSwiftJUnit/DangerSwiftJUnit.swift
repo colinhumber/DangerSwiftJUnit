@@ -8,21 +8,21 @@ public enum DangerSwiftJUnitError: Error {
 }
 
 public struct DangerSwiftJUnit {
-    var tests: [SWXMLHash.XMLElement] = []
-    var passes: [SWXMLHash.XMLElement] = []
-    var failures: [SWXMLHash.XMLElement] = []
-    var errors: [SWXMLHash.XMLElement] = []
-    var skipped: [SWXMLHash.XMLElement] = []
-    var showSkippedTests: Bool = false
-    var headers: [String]? = nil
-    var skippedHeaders: [String] = []
+    public private(set) var tests: [SWXMLHash.XMLElement] = []
+    public private(set) var passes: [SWXMLHash.XMLElement] = []
+    public private(set) var failures: [SWXMLHash.XMLElement] = []
+    public private(set) var errors: [SWXMLHash.XMLElement] = []
+    public private(set) var skipped: [SWXMLHash.XMLElement] = []
+    public private(set) var showSkippedTests: Bool = false
+    public private(set) var headers: [String]? = nil
+    public private(set) var skippedHeaders: [String] = []
     
-    let danger = Danger()
+    internal let danger = Danger()
     
     public init() {
     }
     
-    mutating func parseFiles(_ files: [String]) throws {
+    public mutating func parseFiles(_ files: [String]) throws {
         tests = []
         passes = []
         failures = []
@@ -46,7 +46,7 @@ public struct DangerSwiftJUnit {
         }
     }
     
-    func report() throws {
+    public func report() throws {
         if showSkippedTests && !skipped.isEmpty {
             warn("Skipped \(skipped.count) tests.")
             
@@ -63,8 +63,10 @@ public struct DangerSwiftJUnit {
             markdown(message)
         }
     }
-    
-    private func getReportContent(tests: [SWXMLHash.XMLElement], headers: [String]?) throws -> String {
+}
+
+private extension DangerSwiftJUnit {
+    func getReportContent(tests: [SWXMLHash.XMLElement], headers: [String]?) throws -> String {
         var message = ""
         let commonAttributes = Array(Set(tests.flatMap { $0.allAttributes.keys }))
         
@@ -92,7 +94,7 @@ public struct DangerSwiftJUnit {
         return message
     }
     
-    private func autoLink(value: String) -> String {
+    func autoLink(value: String) -> String {
         if danger.github != nil && FileManager.default.fileExists(atPath: value) {
             return danger.github.createHtmlLink(for: value)
         }
@@ -100,7 +102,7 @@ public struct DangerSwiftJUnit {
         return value
     }
     
-    private func createLink(href: String, text: String?) -> String {
+    func createLink(href: String, text: String?) -> String {
         "<a href='\(href)'>\(text ?? href)</a>"
     }
 }
