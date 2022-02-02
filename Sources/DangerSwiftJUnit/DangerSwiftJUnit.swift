@@ -19,6 +19,9 @@ public struct DangerSwiftJUnit {
     
     let danger = Danger()
     
+    public init() {
+    }
+    
     mutating func parseFiles(_ files: [String]) throws {
         tests = []
         passes = []
