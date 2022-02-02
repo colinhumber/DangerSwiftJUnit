@@ -1,7 +1,6 @@
 import Danger
 import Foundation
 import SWXMLHash
-import Logger
 
 public enum DangerSwiftJUnitError: Error {
     case fileDoesNotExist
@@ -18,14 +17,9 @@ public struct DangerSwiftJUnit {
     public var reportHeaders: [String]? = nil
     public var skippedTestReportHeaders: [String] = []
     
-    private let logger: Logger
-
     internal let danger = Danger()
     
     public init() {
-        let isVerbose = ProcessInfo.processInfo.environment["DEBUG"] != nil
-        let isSilent = ProcessInfo.processInfo.environment["DEBUG"] != nil
-        logger = Logger(isVerbose: isVerbose, isSilent: isSilent)
     }
     
     public mutating func parseFiles(_ files: [String]) throws {
@@ -94,79 +88,33 @@ private extension DangerSwiftJUnit {
                 .compactMap { key in test.attribute(by: key)?.text }
                 .map { autoLink(value: $0) }
             
-            logger.logInfo("ROW VALUES: \(rowValues)")
             message += rowValues.joined(separator: " | ") + "|\n"
         }
         
-        logger.logInfo("MESSAGE: \(message)")
         return message
     }
     
     func autoLink(value: String) -> String {
-        logger.logInfo("GitHub accessible: \(danger.github != nil)")
-        logger.logInfo("Value to link: \(value)")
-        
         if danger.github != nil && FileManager.default.fileExists(atPath: value) {
             return danger.github.createHtmlLink(for: value)
         }
         
         return value
     }
-    
-    func createLink(href: String, text: String?) -> String {
-        "<a href='\(href)'>\(text ?? href)</a>"
-    }
 }
 
 extension Danger.GitHub {
     func createHtmlLink(for value: String) -> String {
-        let filename = URL(fileURLWithPath: value).lastPathComponent
         let repoRoot = pullRequest.head.repo.htmlURL
     
-        let link = "\(repoRoot)/blob/\(pullRequest.head.ref)/\(filename)"
+        guard var link = URL(string: "\(repoRoot)/blob/\(pullRequest.head.ref)") else { return "" }
         
-        return createLink(href: link, text: filename)
+        link.appendPathComponent(value)
+        
+        return createLink(href: link.absoluteString, text: value)
     }
     
     private func createLink(href: String, text: String?) -> String {
         "<a href='\(href)'>\(text ?? href)</a>"
     }
 }
-
-
-//const fileLinks = (paths: string[], useBasename: boolean = true, repoSlug?: string, branch?: string): string => {
-//  // To support enterprise github, we need to handle custom github domains
-//  // this can be pulled out of the repo url metadata
-//
-//  const githubRoot = pr && pr.head.repo.html_url.split(pr.head.repo.owner.login)[0]
-//  const slug = repoSlug || (pr && pr.head.repo.full_name)
-//  const ref = branch || (pr && pr.head.ref)
-//
-//  const toHref = (path: string) => `${githubRoot}${slug}/blob/${ref}/${path}`
-//  // As we should only be getting paths we can ignore the nullability
-//  const hrefs = paths.map(p => href(toHref(p), useBasename ? basename(p) : p)) as string[]
-//  return sentence(hrefs)
-//}
-//
-//# @!group GitHub Misc
-//# Returns an HTML link for a file in the head repository. An example would be
-//# `<a href='https://github.com/artsy/eigen/blob/561827e46167077b5e53515b4b7349b8ae04610b/file.txt'>file.txt</a>`
-//# @return String
-//def html_link(paths)
-//  paths = [paths] unless paths.kind_of?(Array)
-//  commit = head_commit
-//  repo = pr_json[:head][:repo][:html_url]
-//  paths = paths.map do |path|
-//    path_with_slash = "/#{path}" unless path.start_with? "/"
-//    create_link("#{repo}/blob/#{commit}#{path_with_slash}", path)
-//  end
-//
-//  return paths.first if paths.count < 2
-//  paths.first(paths.count - 1).join(", ") + " & " + paths.last
-//end
-//
-//private
-//
-//def create_link(href, text)
-//  "<a href='#{href}'>#{text}</a>"
-//end
