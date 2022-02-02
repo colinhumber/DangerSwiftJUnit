@@ -1,6 +1,7 @@
 import Danger
 import Foundation
 import SWXMLHash
+import Logger
 
 public enum DangerSwiftJUnitError: Error {
     case fileDoesNotExist
@@ -17,9 +18,14 @@ public struct DangerSwiftJUnit {
     public var reportHeaders: [String]? = nil
     public var skippedTestReportHeaders: [String] = []
     
+    private let logger: Logger
+
     internal let danger = Danger()
     
     public init() {
+        let isVerbose = ProcessInfo.processInfo.environment["DEBUG"] != nil
+        let isSilent = ProcessInfo.processInfo.environment["DEBUG"] != nil
+        logger = Logger(isVerbose: isVerbose, isSilent: isSilent)
     }
     
     public mutating func parseFiles(_ files: [String]) throws {
@@ -88,13 +94,18 @@ private extension DangerSwiftJUnit {
                 .compactMap { key in test.attribute(by: key)?.text }
                 .map { autoLink(value: $0) }
             
+            logger.logInfo("ROW VALUES: \(rowValues)")
             message += rowValues.joined(separator: " | ") + "|\n"
         }
         
+        logger.logInfo("MESSAGE: \(message)")
         return message
     }
     
     func autoLink(value: String) -> String {
+        logger.logInfo("GitHub accessible: \(danger.github != nil)")
+        logger.logInfo("Value to link: \(value)")
+        
         if danger.github != nil && FileManager.default.fileExists(atPath: value) {
             return danger.github.createHtmlLink(for: value)
         }
