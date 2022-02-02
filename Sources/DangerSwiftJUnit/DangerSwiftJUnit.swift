@@ -13,9 +13,9 @@ public struct DangerSwiftJUnit {
     public private(set) var failures: [SWXMLHash.XMLElement] = []
     public private(set) var errors: [SWXMLHash.XMLElement] = []
     public private(set) var skipped: [SWXMLHash.XMLElement] = []
-    public private(set) var showSkippedTests: Bool = false
-    public private(set) var headers: [String]? = nil
-    public private(set) var skippedHeaders: [String] = []
+    public var showSkippedTests: Bool = false
+    public var reportHeaders: [String]? = nil
+    public var skippedTestReportHeaders: [String] = []
     
     internal let danger = Danger()
     
@@ -50,7 +50,7 @@ public struct DangerSwiftJUnit {
         if showSkippedTests && !skipped.isEmpty {
             warn("Skipped \(skipped.count) tests.")
             
-            let message = "### Skipped: \n\n\(try getReportContent(tests: skipped, headers: skippedHeaders))"
+            let message = "### Skipped: \n\n\(try getReportContent(tests: skipped, headers: skippedTestReportHeaders))"
             markdown(message)
         }
         
@@ -59,7 +59,7 @@ public struct DangerSwiftJUnit {
             
             let tests = failures + errors
             
-            let message = "### Tests: \n\n\(try getReportContent(tests: tests, headers: headers))"
+            let message = "### Tests: \n\n\(try getReportContent(tests: tests, headers: reportHeaders))"
             markdown(message)
         }
     }
