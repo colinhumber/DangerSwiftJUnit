@@ -4,6 +4,8 @@ Danger-Swift plugin that parses a JUnit test report and provides automatic repor
 
 Most test runners have the ability to generated a test report conforming to the JUnit XML standard. This plugin can parse these files, extract all passed, failed, error'd, or skipped tests.
 
+Migrated to Swift from [danger-junit](https://github.com/orta/danger-junit). Props to Orta Therox and contributers for all their hard work on this.
+
 ## How Does It Look?
 
 ![image](https://user-images.githubusercontent.com/104855/152434861-afb44e06-6913-4378-9e3b-66b700fd3340.png)
