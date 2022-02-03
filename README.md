@@ -9,9 +9,6 @@ Most test runners have the ability to generated a test report conforming to the 
 ![image](https://user-images.githubusercontent.com/104855/152434861-afb44e06-6913-4378-9e3b-66b700fd3340.png)
 
 ### Install DangerSwiftJUnit
-#### Swift Package Manager (More performant)
-You can use a "full SPM" solution to install both `danger-swift` and `DangerSwiftJUnit`.
-
 - Add to your `Package.swift`:
 
 ```swift
