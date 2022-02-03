@@ -27,6 +27,8 @@ let package = Package(
             ]),
         .testTarget(
             name: "DangerSwiftJUnitTests",
-            dependencies: ["DangerSwiftJUnit"]),
+            dependencies: ["DangerSwiftJUnit",
+                           .product(name: "DangerFixtures", package: "swift")],
+            resources: [.copy("Fixtures")])
     ]
 )
